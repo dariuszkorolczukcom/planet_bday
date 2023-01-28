@@ -16,6 +16,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 
 const planets = [
@@ -78,9 +79,13 @@ function App() {
 
   return (
     <div style={{padding:20}}>
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="md">
       <Grid container spacing={2}>
-        <Grid style={{padding:20}} item xs={12}>
+
+      <Grid item xs={12}>
+      <Typography variant="h2" style={{padding:20,fontFamily:"Star Jedi, sans-serif"}}>Space Birthday</Typography>
+      </Grid>
+        <Grid style={{padding:20}} item xs={12}  md={8}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Stack spacing={3}>
           <MobileDatePicker
@@ -99,10 +104,12 @@ function App() {
             alignItems="center"
             justify="center"   
             container
-            spacing={0} >
+            md={4}>
         <Button 
           onClick={()=>handleSubmit(bday)}
           color='primary'
+          size='large'
+          style={{margin:'auto'}}
           variant="outlined" >Submit</Button>
       </Grid>
       <Grid container>
