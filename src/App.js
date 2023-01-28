@@ -1,31 +1,47 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './styles/App.css';
+
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import Button from '@mui/material/Button';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Avatar from '@mui/material/Avatar';
 
 const planets = [
   {
-      name: "Merkury",
-      year: 87.969,
+    name: "Mercury",
+    year: 87.969,
   },
   {
-      name: "Venus",
-      year: 224.65,
+    name: "Venus",
+    year: 224.65,
   },
   {
-      name: "Mars",
-      year: 687,
+    name: "Mars",
+    year: 687,
   },
   {
-      name: "Jupiter",
-      year: 4333,
+    name: "Jupiter",
+    year: 4333,
   },
   {
-      name: "Saturn",
-      year: 10759,
+    name: "Saturn",
+    year: 10759,
   },
   {
-      name: "Uranus",
-      year: 30687,
+    name: "Uranus",
+    year: 30687,
   }
 ]
 
@@ -46,6 +62,7 @@ const processPlanets = (bday, planets) => {
     const [years, when] = countPlanetBirthday(bday, planet);
     planet.years = years;
     planet.when = when;
+    console.log(planet)
     return planet
   });
 }
@@ -54,49 +71,72 @@ function App() {
   const [bday, setBday] = useState(0);
   const [planetArray, setPlanetArray] = useState({});
 
-  const handleChange = (event) => {
-    setBday(event.target.value)
-  }
-
-  const handleSubmit = (event) => {
-    
+  const handleSubmit = (bday) => {
+    console.log(new Date(bday).toLocaleDateString())
     setPlanetArray(processPlanets(bday, planets))
-    
-    event.preventDefault();
   }
 
   return (
-    <div className="App">
-      <form onSubmit={handleSubmit}>
-        <label>
-          When were you born?(YYYY-MM-DD)
-          <input type="text" name="bday" value={bday} onChange={handleChange} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
-      {planetArray.length ?
-      <table>
-      <thead>
-        <tr>
-          <th>Planet</th>
-          <th>Year length</th>
-          <th>Age</th>
-          <th>Next Birthday</th>
-        </tr>
-      </thead>
-      <tbody key="planets">
-        {planets.map((planet) => {
-          return (
-            <tr >
-              <td>{planet.name}</td>
-              <td>{planet.year} days</td>
-              <td>{planet.years - 1}</td>
-              <td>{planet.when}({planet.years})</td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table> : ""}
+    <div style={{padding:20}}>
+    <Container component="main" maxWidth="xs">
+      <Grid container spacing={2}>
+        <Grid style={{padding:20}} item xs={12}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Stack spacing={3}>
+          <MobileDatePicker
+            style={{margin:20}}
+            label="Your Birthday"
+            value={bday}
+            onChange={(newValue) => {
+              setBday(newValue);
+            }}
+            renderInput={(params) => <TextField {...params} />}
+          />
+          </Stack>
+        </LocalizationProvider>
+      </Grid>
+      <Grid direction="column"
+            alignItems="center"
+            justify="center"   
+            container
+            spacing={0} >
+        <Button 
+          onClick={()=>handleSubmit(bday)}
+          color='primary'
+          variant="outlined" >Submit</Button>
+      </Grid>
+      <Grid container>
+          {planetArray.length ?
+        <TableContainer component={Paper}>
+      <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Planet</TableCell>
+            <TableCell align="right">Age</TableCell>
+            <TableCell align="right">Next Birthday</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {planets.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+              <Avatar alt="Remy Sharp" src={`/planets/${row.name.toLowerCase()}.png`} />
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.years - 1}</TableCell>
+              <TableCell align="right">{row.when}({row.years})</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    : ""}
+        </Grid>
+      </Grid>
+    </Container>
     </div>
   );
 }
