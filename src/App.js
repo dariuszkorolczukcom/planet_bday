@@ -19,6 +19,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 
+
 const planets = [
   {
     name: "Mercury",
@@ -104,6 +105,7 @@ function App() {
             alignItems="center"
             justify="center"   
             container
+            xs={12}
             md={4}>
         <Button 
           onClick={()=>handleSubmit(bday)}
@@ -112,15 +114,15 @@ function App() {
           style={{margin:'auto'}}
           variant="outlined" >Submit</Button>
       </Grid>
-      <Grid container>
+      <Grid container xs={12}>
           {planetArray.length ?
         <TableContainer component={Paper}>
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Planet</TableCell>
-            <TableCell align="right">Age</TableCell>
-            <TableCell align="right">Next Birthday</TableCell>
+            <TableCell align="right">Your Age</TableCell>
+            <TableCell align="right">Your Next Birthday</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -142,6 +144,15 @@ function App() {
     </TableContainer>
     : ""}
         </Grid>
+      </Grid>
+      <Grid direction="column"
+            alignItems="center"
+            justify="center"   
+            container
+            xs={12}>
+      <div>
+        &copy; <a href="https://dariuszkorolczuk.com" target="_blank">Dariusz Korolczuk</a> 2023
+      </div>
       </Grid>
     </Container>
     </div>
