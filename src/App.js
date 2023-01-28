@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactGA from "react-ga";
 import './styles/App.css';
 
 import Container from '@mui/material/Container';
@@ -19,6 +20,12 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 
+const useAnalyticsEventTracker = (category="space birthday") => {
+  const eventTracker = (action = "submit birthday date", label = "submit birthday") => {
+    ReactGA.event({category, action, label});
+  }
+  return eventTracker;
+}
 
 const planets = [
   {
@@ -70,10 +77,12 @@ const processPlanets = (bday, planets) => {
 }
 
 function App() {
+  const gaEventTracker = useAnalyticsEventTracker('Contact us');
   const [bday, setBday] = useState(0);
   const [planetArray, setPlanetArray] = useState({});
 
   const handleSubmit = (bday) => {
+    gaEventTracker(bday)
     console.log(new Date(bday).toLocaleDateString())
     setPlanetArray(processPlanets(bday, planets))
   }
