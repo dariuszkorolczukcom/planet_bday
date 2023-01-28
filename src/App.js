@@ -114,7 +114,7 @@ function App() {
           style={{margin:'auto'}}
           variant="outlined" >Submit</Button>
       </Grid>
-      <Grid container xs={12}>
+      <Grid container>
           {planetArray.length ?
         <TableContainer component={Paper}>
       <Table aria-label="simple table">
