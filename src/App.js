@@ -166,6 +166,13 @@ useEffect(() => {
       >
         <TableHead>
           <TableRow>
+            <TableCell colSpan={3} align="center">
+              <Typography variant="p" style={{padding:20,fontFamily:"Star Jedi, sans-serif"}}>
+                www.space-birthday.net
+              </Typography>
+            </TableCell>
+          </TableRow>
+          <TableRow>
             <TableCell>Planet</TableCell>
             <TableCell align="right">Your Age</TableCell>
             <TableCell align="right">Your Next Birthday</TableCell>
