@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactGA from "react-ga";
 import './styles/App.css';
-
-import { FacebookShareButton, FacebookIcon } from 'react-share';
-
+import { toJpeg, toBlob } from 'html-to-image';
+import { saveAs } from 'file-saver';
+import { FacebookProvider, ShareButton } from 'react-facebook';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -21,62 +21,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
-
-const ShareOnFacebookButton = ({ tableData }) => {
-  const createImageFromTable = () => {
-    const table = document.querySelector('table');
-    const img = document.createElement('img');
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    canvas.width = table.offsetWidth;
-    canvas.height = table.offsetHeight;
-
-    img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(table.outerHTML)));
-
-    img.onload = () => {
-      context.drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL('image/png');
-      const blob = dataURLtoBlob(dataURL);
-      shareOnFacebook(blob);
-    };
-  };
-
-  const dataURLtoBlob = (dataURL) => {
-    const parts = dataURL.split(';base64,');
-    const contentType = parts[0].split(':')[1];
-    const raw = window.atob(parts[1]);
-    const rawLength = raw.length;
-    const uInt8Array = new Uint8Array(rawLength);
-
-    for (let i = 0; i < rawLength; ++i) {
-      uInt8Array[i] = raw.charCodeAt(i);
-    }
-
-    return new Blob([uInt8Array], { type: contentType });
-  };
-
-  const shareOnFacebook = (blob) => {
-    const file = new File([blob], 'table.png', { type: 'image/png' });
-    const data = new FormData();
-    data.append('file', file);
-
-    fetch('https://graph.facebook.com/v12.0/me/photos?access_token=your-access-token', {
-      method: 'POST',
-      body: data,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.link)}&amp;src=sdkpreparse`);
-      });
-  };
-
-  return (
-    <FacebookShareButton url={'https://www.space-birthday.net/'}>
-      <FacebookIcon size={32} round={true} onClick={createImageFromTable} />
-    </FacebookShareButton>
-  );
-};
 
 const useAnalyticsEventTracker = (category="space birthday") => {
   const eventTracker = (action = "submit birthday date", label = "submit birthday") => {
@@ -135,14 +79,45 @@ const processPlanets = (bday, planets) => {
 }
 
 function App() {
+  const componentRef = useRef();
   const gaEventTracker = useAnalyticsEventTracker('Contact us');
   const [bday, setBday] = useState(0);
   const [planetArray, setPlanetArray] = useState({});
+  // const [shareImageUrl, setShareImageUrl] = useState("");
+  const [shareDataUrl, setShareDataUrl] = useState("");
+
+  const convertToImage = async () => {
+    try {
+      const file = componentRef.current
+      console.log(file)
+      const dataUrl = await toJpeg(file, { quality: 0.95 });
+      // const blob = await toBlob(file, { quality: 0.95 })
+      // console.log( typeof dataUrl)
+      // console.log( blob instanceof Blob)
+      setShareDataUrl(dataUrl)
+      // const url = URL.createObjectURL(blob)
+      // setShareImageUrl(url);
+      // console.log(url)
+    } catch (error) {
+      console.error('Błąd podczas konwersji komponentu na zdjęcie:', error);
+    }
+  };
+
+useEffect(() => {
+  // Update the document title using the browser API
+  console.log("shareDataUrl",shareDataUrl);
+});
+
+  const downloadPicture = async () => {
+    console.log("downloadPicture", shareDataUrl)
+    saveAs(shareDataUrl, 'planet-birthday.jpg');
+  }
 
   const handleSubmit = (bday) => {
     gaEventTracker(bday)
     console.log(new Date(bday).toLocaleDateString())
     setPlanetArray(processPlanets(bday, planets))
+    convertToImage()
   }
 
   return (
@@ -183,8 +158,12 @@ function App() {
       </Grid>
       <Grid container>
           {planetArray.length ?
-        <TableContainer component={Paper}>
-      <Table aria-label="simple table">
+    <>
+    <TableContainer component={Paper}>
+      <Table 
+        aria-label="simple table"
+        ref={componentRef}
+      >
         <TableHead>
           <TableRow>
             <TableCell>Planet</TableCell>
@@ -209,10 +188,14 @@ function App() {
         </TableBody>
       </Table>
     </TableContainer>
+        <FacebookProvider appId="YOUR_APP_ID">
+          {/* <ShareButton href={shareDataUrl}>
+            Kliknij, aby udostępnić zdjęcie
+          </ShareButton> */}
+          <Button onClick={()=>downloadPicture()}>Pobierz</Button>
+        </FacebookProvider>
+    </>
     : ""}
-        </Grid>
-        <Grid>
-        <ShareOnFacebookButton tableData={planets} />
         </Grid>
       </Grid>
       <Grid direction="column"
