@@ -89,7 +89,6 @@ function App() {
   const convertToImage = async () => {
     try {
       const file = componentRef.current
-      console.log(file)
       const dataUrl = await toJpeg(file, { quality: 0.95 });
       // const blob = await toBlob(file, { quality: 0.95 })
       // console.log( typeof dataUrl)
@@ -113,11 +112,11 @@ useEffect(() => {
     saveAs(shareDataUrl, 'planet-birthday.jpg');
   }
 
-  const handleSubmit = (bday) => {
+  const handleSubmit = async (bday) => {
     gaEventTracker(bday)
     console.log(new Date(bday).toLocaleDateString())
-    setPlanetArray(processPlanets(bday, planets))
-    convertToImage()
+    await setPlanetArray(processPlanets(bday, planets))
+    await convertToImage()
   }
 
   return (
